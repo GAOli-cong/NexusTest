@@ -1,0 +1,35 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        maven {
+            allowInsecureProtocol = true
+            credentials {
+                username "admin"
+                password "admin"
+            }
+            url "http://localhost:8081/repository/test/"
+        }
+
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            allowInsecureProtocol = true
+            credentials {
+                username "admin"
+                password "admin"
+            }
+            url "http://localhost:8081/repository/test/"
+        }
+    }
+}
+
+rootProject.name = "NexusTest"
+include ':app'
+include ':mylibrary'
