@@ -1,0 +1,77 @@
+apply plugin: 'maven-publish'
+//组织id
+def GroupId = 'com.glc.top'
+//项目id
+def ArtifactId = 'top'
+//版本号
+def Version = '1.0.5'
+//登录的nexus用户名
+def userName = "admin"
+//登录的nexus密码
+def passWord = "admin"
+
+//仓库地址
+def releasesRepoUrl = "http://localhost:8081/repository/test/"
+
+
+//生成sources保证aar可以查看源码
+task generateSourcesJar(type:Jar){
+    //这里gradle版本8以上有改动 需要用 archiveClassifier 而不是classifier
+    archiveClassifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+//生成javadoc
+task generateJavadocJar(type: Jar){
+    from android.sourceSets.main.java.srcDirs
+    archiveClassifier.set("javadoc")
+}
+
+afterEvaluate {
+    publishing {
+        //发布的 arr 包配置
+        publications{
+            //名字可以自己指定，如果有多渠道，整段多复制一个
+            release(MavenPublication){
+
+                groupId = GroupId//公司域名
+                artifactId = ArtifactId//该aar包的名称
+                version = Version//版本号
+
+                // 必须有这个 否则不会上传AAR包
+                afterEvaluate { artifact(tasks.getByName("bundleReleaseAar")) }
+                // 多渠道，可以自行指定aar路径
+                // def projectName = project.getName()
+                // artifact "build/outputs/aar/${projectName}-release.aar"
+                // 上传source，这样使用方可以看到方法注释
+                artifact generateSourcesJar
+                // 上传javadoc，这样使用方可以看到方法注释
+                artifact generateJavadocJar
+                //依赖关系
+                pom.withXml{
+                    def dependenciesNode = asNode().appendNode("dependencies")
+                    configurations.implementation.allDependencies.forEach(){
+                        Dependency dependency ->
+                            if (dependency.version != "unspecified" && dependency.name != "unspecified"){
+                                def dependencyNode = dependenciesNode.appendNode('dependency')
+                                dependencyNode.appendNode('groupId', dependency.group)
+                                dependencyNode.appendNode('artifactId', dependency.name)
+                                dependencyNode.appendNode('version', dependency.version)
+                            }
+                    }
+                }
+            }
+        }
+        //仓库地址配置
+        repositories {
+            maven {
+                //允许使用 http
+                allowInsecureProtocol = true
+                url = releasesRepoUrl
+                credentials {
+                    username = userName
+                    password = passWord
+                }
+            }
+        }
+    }
+}

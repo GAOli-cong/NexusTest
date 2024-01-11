@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
 }
+apply from: '../uploadArchive.gradle'
 
 android {
     namespace 'com.glc.mylibrary'
@@ -23,12 +24,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-}
-
-//将源码打包  为了保证引入的aar  包可以查看源码
-task sourcesJar(type: Jar) {
-    archiveClassifier = 'sources'
-    from android.sourceSets.main.java.srcDirs
 }
 
 dependencies {

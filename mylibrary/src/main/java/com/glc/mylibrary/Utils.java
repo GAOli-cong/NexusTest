@@ -1,7 +1,7 @@
 package com.glc.mylibrary;
 
 /**
- * @description:
+ * @description: Utils
  * @date: 2024/1/10 18:33
  * @author: gaolicong
  * @email: gaolicong6@gmail.com
